@@ -1,7 +1,6 @@
 # Aplikasi Percetakan
 
-Sistem cetak merupakan sistem berbasis CLI Desktop yang memberikan fasilitas kepada para pelanggan untuk melakukan pencetakan dokumen dengan cara mengunggah berkas yang ingin dicetak ke dalam sistem kapan pun dan di manapun mereka berada. Sistem cetak ini dikelola oleh kelompok 2 untuk melayani para pelanggan yang ingin mencetak dokumen dan dapat mengakomodasi beberapa layanan yang dimiliki pihak percetakan seperti penjilidan dan penyampulan dokumen. Diharapkan sistem ini dapat mengatasi beberapa masalah yang sering dihadapi oleh pelanggan seperti antrian yang panjang, berkas atau media penyimpanan yang sering terinfeksi virus saat dihubungkan dengan komputer di jasa percetakan, saat mencetak dokumen di tempat percetakan dan juga untuk memenuhi tugas UAS Algoritma Pemrograman.
-
+The print system is a Desktop CLI-based system that provides facilities for customers to print documents by uploading the files they want to print into the system whenever and wherever they are. This printing system is managed by group 2 to serve customers who want to print documents and can accommodate several services owned by the printing company such as binding and stamping documents. It is hoped that this system can overcome some of the problems often faced by customers such as long queues, files or storage media that are often infected with viruses when connected to computers in printing services, when printing documents at the printing place and also to fulfill the UAS Programming Algorithm assignment.
 
 ## Table of Contents
 
