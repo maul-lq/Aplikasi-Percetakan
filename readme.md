@@ -48,4 +48,4 @@ To run the application, execute the following command in your terminal:
 ```
 
 ## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the Unlicense License - see the LICENSE file for details.
