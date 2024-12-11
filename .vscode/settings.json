@@ -9,6 +9,9 @@
         "map": "cpp",
         "xstring": "cpp",
         "vector": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "utility": "cpp"
     }
 }
