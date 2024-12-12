@@ -1,6 +1,6 @@
 # Aplikasi Percetakan
 
-The print system is a Desktop CLI-based system that provides facilities for customers to print documents by uploading the files they want to print into the system whenever and wherever they are. This printing system is managed by group 2 to serve customers who want to print documents and can accommodate several services owned by the printing company such as binding and stamping documents. It is hoped that this system can overcome some of the problems often faced by customers such as long queues, files or storage media that are often infected with viruses when connected to computers in printing services, when printing documents at the printing place and also to fulfill the UAS Programming Algorithm assignment.
+Projek UAS
 
 ## Table of Contents
 
