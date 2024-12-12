@@ -6,12 +6,14 @@
         "**/cache/": true
     },
     "files.associations": {
+        "*.ejs": "html",
         "map": "cpp",
         "xstring": "cpp",
         "vector": "cpp",
         "algorithm": "cpp",
         "iostream": "cpp",
         "ostream": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "ios": "cpp"
     }
 }

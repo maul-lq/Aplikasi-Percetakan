@@ -11,7 +11,7 @@ using namespace std;
 /**
  * @brief Fungsi untuk mencetak judul aplikasi.
  *
- * Fungsi ini membersihkan konsol, membersihkan buffer input, dan mencetak judul aplikasi.
+ * Fungsi ini membersihkan konsol, membersihkan isi varibel pilihan_pengguna dan buffer input, sekaligus mencetak judul aplikasi.
  * Ini juga mencetak garis pemisah untuk visualisasi yang lebih baik.
  *
  * @return void
@@ -35,6 +35,7 @@ bool isLogin = false;
 // Ini digunakan untuk mewakili akun pengguna dalam aplikasi Aplikasi Percetakan.
 // Struktur ini berisi berbagai bidang:
 //
+// - 'id': Variabel integer yang menyimapn id pengguna.
 // - 'nama': Variabel string yang menyimpan nama pengguna.
 // - 'nomor_hp': Variabel string yang menyimpan nomor telepon pengguna.
 // - 'username': Variabel string yang menyimpan nama pengguna yang unik.
@@ -56,52 +57,87 @@ enum Role
 };
 struct Akun
 {
+    int id;
     string nama;
     string nomor_hp;
     string username;
     string password;
     Role role;
 };
-// agar bisa membedakan mana yang akun Admin dna User.
-// Buat variabel array berupa vector yang fungsinya untuk menyimpan akun pengguna aplikasi.
-vector<pair<int, Akun>> Database_Akun = {
-    {1, {"Admin", "084277744102", "admin", "admin123", Admin}}};
+
+// Variabel Database_Akun adalah vektor of Akun yang digunakan untuk menyimpan data akun pengguna.
+// Variabel ini diinisialisasi dengan satu objek Akun yang berisi data admin.
+vector<Akun> Database_Akun = {{1,"Admin", "084277744102", "admin", "admin123", Admin}};
 
 Akun session; // Digunakan untuk menyimpan data akun saat sudah login
 
 #pragma endregion
 
 #pragma region Login Regiser Logout
+/**
+ * @brief Fungsi ini bertanggung jawab atas logika logout aplikasi.
+ *
+ * Fungsi ini mengatur status login, menghapus data session, dan mengeset peran ke Null.
+ * Ini dipanggil ketika pengguna memilih untuk logout.
+ *
+ * @return void
+ */
 void LogoutLogic()
 {
     isLogin = false;
-    session.nama="";
-    session.nomor_hp="";
-    session.username="";
-    session.password="";
+    session.nama = "";
+    session.nomor_hp = "";
+    session.username = "";
+    session.password = "";
     session.role = Null;
 }
 
+/**
+ * @brief Fungsi yang bertanggung jawab atas logika login aplikasi.
+ *
+ * Fungsi ini mencari username dan password yang sesuai di dalam database.
+ * Jika username dan password cocok, fungsi ini akan menyimpan data akun ke dalam variabel 'session' dan mengembalikan nilai true.
+ * Jika username dan password tidak cocok, fungsi ini akan mengembalikan nilai false.
+ *
+ * @param username Username yang dimasukkan pengguna.
+ * @param password Password yang dimasukkan pengguna.
+ *
+ * @return bool Nilai true jika username dan password cocok, false jika tidak cocok.
+ */
 bool LoginLogic(string username, string password)
 {
     // Cek username dan password di database
-    for (pair<int, Akun> akun : Database_Akun)
+    for (Akun akun : Database_Akun)
     {
-        if (akun.second.username == username && akun.second.password == password)
+        if (akun.username == username && akun.password == password)
         {
-            session = akun.second;
+            session = akun;
             return true;
         }
     }
     return false;
 }
 
+
+/**
+ * @brief Fungsi untuk menangani logika pendaftaran pengguna.
+ *
+ * Fungsi ini memeriksa apakah username yang diberikan sudah ada di database.
+ * Jika username unik, fungsi ini akan membuat akun baru dengan detail yang diberikan dan menyimpannya ke database.
+ *
+ * @param nama Nama lengkap pengguna.
+ * @param nomor_hp Nomor telepon pengguna.
+ * @param username Username unik untuk pengguna.
+ * @param password Kata sandi untuk pengguna.
+ *
+ * @return bool Mengembalikan true jika pendaftaran berhasil (username unik dan akun disimpan), false jika tidak.
+ */
 bool RegisterLogic(string nama, string nomor_hp, string username, string password)
 {
     bool isUsernameExist = false;
-    for (pair<int, Akun> akun : Database_Akun)
+    for (Akun akun : Database_Akun)
     {
-        if (akun.second.username == username)
+        if (akun.username == username)
         {
             isUsernameExist = true;
             break;
@@ -117,10 +153,12 @@ bool RegisterLogic(string nama, string nomor_hp, string username, string passwor
         // Buat id baru
         int id = Database_Akun.size() + 1;
         // Simpan akun ke database
-        Database_Akun.push_back({id, {nama, nomor_hp, username, password, User}});
+        Database_Akun.push_back({id, nama, nomor_hp, username, password, User});
         return true;
     }
 }
+
+
 
 void Tampilan_Login()
 {
