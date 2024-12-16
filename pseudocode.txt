@@ -1,0 +1,528 @@
+BEGIN Program
+    DECLARE CONSTANT biayaCetak = 5000
+    DECLARE GLOBAL VARIABLES:
+        keluar = false
+        pilihan_pengguna = ""
+        isLogin = false
+        isWithBooking = false
+        session: Akun
+
+    DEFINE STRUCTURES:
+        PemesananCetak
+            id: INTEGER
+            username: STRING
+            jenisCetak: STRING
+            jumlahCetak: INTEGER
+            finishing: STRING
+            lokasi: STRING
+            keterangan: STRING
+            fileCetak: STRING
+
+        Pesanan
+            id: INTEGER
+            username: STRING
+            hargaTotal: INTEGER
+            status: STRING
+
+        Laporan_Keuangan
+            username: STRING
+            judul: STRING
+            harga: INTEGER
+            jenis: STRING
+
+        Akun
+            id: INTEGER
+            nama: STRING
+            nomor_hp: STRING
+            username: STRING
+            password: STRING
+            role: ENUM (Admin, User, Null)
+
+        Item
+            name: STRING
+            price: INTEGER
+            stock: INTEGER
+
+    INITIALIZE:
+        Database_Akun = [
+            {id = 1, nama = "Admin", nomor_hp = "084277744102", username = "admin", password = "admin123", role = Admin},
+            {id = 2, nama = "User", nomor_hp = "084277744102", username = "user", password = "user123", role = User}
+        ]
+
+        catalog = [
+            {name = "Pulpen", price = 5000, stock = 10},
+            {name = "Pensil", price = 3000, stock = 5},
+            {name = "Buku Tulis", price = 10000, stock = 8},
+            {name = "Penghapus", price = 2000, stock = 7},
+            {name = "Penggaris", price = 4000, stock = 15}
+        ]
+
+    FUNCTION CetakJudulAplikasi()
+        CLEAR console
+        PRINT "Aplikasi Percetakan Online"
+        PRINT "---------------------------"
+
+    FUNCTION LogoutLogic()
+        SET isLogin = false
+        CLEAR session
+
+    FUNCTION LoginLogic(username, password)
+        FOR EACH akun IN Database_Akun
+            IF akun.username == username AND akun.password == password THEN
+                SET session = akun
+                RETURN true
+        RETURN false
+
+    FUNCTION RegisterLogic(nama, nomor_hp, username, password)
+        CHECK IF username EXISTS IN Database_Akun
+            IF EXISTS THEN RETURN false
+        CREATE new_id = Database_Akun.size + 1
+        ADD new Akun to Database_Akun
+        RETURN true
+
+    PROCEDURE Tampilan_Login()
+        CALL CetakJudulAplikasi
+        PROMPT user for username and password
+        IF LoginLogic(username, password) THEN
+            SET isLogin = true
+        ELSE
+            DISPLAY error message
+            PAUSE and CLEAR console
+
+    PROCEDURE Tampilan_Register()
+        CALL CetakJudulAplikasi
+        PROMPT user for registration details (nama, nomor_hp, username, password)
+        IF RegisterLogic(nama, nomor_hp, username, password) THEN
+            CONTINUE
+        ELSE
+            DISPLAY "Username telah tersedia"
+            PAUSE and CLEAR console
+
+    PROCEDURE Tampilan_LoginRegister()
+        WHILE NOT isLogin
+            CALL CetakJudulAplikasi
+            DISPLAY login/register menu
+            PROMPT pilihan_pengguna
+            IF pilihan_pengguna IS "1" THEN
+                CALL Tampilan_Login
+            ELSE IF pilihan_pengguna IS "2" THEN
+                CALL Tampilan_Register
+            ELSE IF pilihan_pengguna IS "3" THEN
+                SET keluar = true
+                BREAK
+            ELSE
+                DISPLAY invalid choice message
+                PAUSE and CLEAR console
+
+    FUNCTION displayCatalog(catalog)
+        CALL CetakJudulAplikasi
+        DISPLAY catalog items with prices and stock
+        PAUSE
+
+    FUNCTION findItemIndex(catalog, itemName)
+        FOR EACH item IN catalog
+            IF item.name == itemName THEN
+                RETURN index
+        RETURN -1
+
+    PROCEDURE manageCatalog(catalog)
+        WHILE true
+            CALL CetakJudulAplikasi
+            DISPLAY catalog management options
+            PROMPT adminChoice
+            IF adminChoice IS "1" THEN
+                CALL displayCatalog(catalog)
+                PROMPT for item name
+                CHECK IF item exists
+                IF stock is 0 THEN
+                    PROMPT for restock amount
+                    UPDATE stock
+            ELSE IF adminChoice IS "2" THEN
+                PROMPT for item name and new price
+                UPDATE price IF item exists
+            ELSE IF adminChoice IS "3" THEN
+                PROMPT for item name
+                DISPLAY price IF item exists
+            ELSE IF adminChoice IS "4" THEN
+                EXIT loop
+            ELSE
+                DISPLAY invalid choice message
+                PAUSE
+
+    FUNCTION hitungHargaPesanan(dataPemesananCetak)
+        INITIALIZE totalBiaya = 0
+        FOR EACH pemesanan IN dataPemesananCetak
+            IF pemesanan.username == session.username THEN
+                ADD jumlahCetak * biayaCetak TO totalBiaya
+        RETURN totalBiaya
+
+PROCEDURE booking(hargaCetakan)
+    DECLARE jumlahKertas, indexItem = NULL
+    DECLARE keranjangBarang AS VECTOR OF STRING
+    DECLARE hargaBarang AS VECTOR OF INTEGER
+    DECLARE pilih AS CHARACTER
+
+    DO
+        CALL displayCatalog()
+        PROMPT "Pilih nomor barang (0 untuk selesai): "
+        READ nomorBarang
+
+        SWITCH (nomorBarang)
+            CASE 1:
+                SET namaBarang = "Pulpen"
+                SET indexItem = findItemIndex(catalog, namaBarang)
+                IF catalog[indexItem].stock > 0 THEN
+                    ADD namaBarang TO keranjangBarang
+                    ADD catalog[indexItem].price TO hargaBarang
+                    DECREMENT catalog[indexItem].stock
+                ELSE
+                    DISPLAY "Maaf stok telah habis!"
+                    PAUSE
+            CASE 2, 3, 4, 5:
+                // Similar logic for "Pensil", "Buku Tulis", "Penghapus", "Penggaris"
+        END SWITCH
+
+        PROMPT "Ingin tambah barang lagi? (y/n): "
+        READ pilih
+    WHILE pilih IS 'y' OR 'Y'
+
+    DECLARE totalHarga = 0
+    DISPLAY "Barang Tambahan:"
+    FOR EACH i IN keranjangBarang
+        ADD hargaBarang[i] TO totalHarga
+        DISPLAY "- ", keranjangBarang[i], " (Rp ", hargaBarang[i], ")"
+
+    PROMPT "Pilih Metode Pembayaran (1. Transfer Bank, 2. E-Wallet): "
+    READ metodeBayar
+    PROMPT "Pilih Metode Pengiriman (1. Kurir, 2. Ambil Ditempat): "
+    READ metodePengiriman
+
+    DISPLAY "===== PEMBAYARAN ====="
+    DISPLAY "Total Harga: Rp ", totalHarga + hargaCetakan
+
+    CREATE Pesanan p
+    SET p.id = dataPesanan.size() + 1
+    SET p.username = session.username
+    SET p.status = "pesanan diproses"
+    SET p.hargaTotal = IF isWithBooking THEN totalHarga + hargaCetakan ELSE totalHarga
+    SET isWithBooking = false
+
+    CREATE Laporan_Keuangan lk
+    SET lk.harga = p.hargaTotal
+    SET lk.judul = "Cetak Dengan Booking"
+    SET lk.username = session.username
+    SET lk.jenis = "Cetak + Booking"
+
+    ADD p TO dataPesanan
+    ADD lk TO Kumpulan_Laporan_Keuangan
+
+    DISPLAY "Pesanan Sedang Diproses..."
+    PAUSE
+
+FUNCTION pilihDariMenu(opsi, prompt)
+    DISPLAY prompt
+    FOR EACH i IN opsi
+        DISPLAY i + 1, ". ", opsi[i]
+
+    DO
+        PROMPT "Pilih (1-", opsi.size(), "): "
+        READ pilihan
+    WHILE pilihan NOT IN RANGE (1, opsi.size())
+
+    RETURN opsi[pilihan - 1]
+
+PROCEDURE tambahPemesanan()
+    DECLARE tambahLagi AS CHARACTER
+    DECLARE jenisCetakOpsi = ["Printcopy", "Fotocopy"]
+    DECLARE finishingOpsi = ["None", "Laminating", "Staples", "Jilid"]
+    DECLARE lokasiOpsi = ["Tanah Baru, Beji", "Pondok Cina, Beji", "Depok Jaya, Pancoran Mas"]
+
+    DISPLAY "=== Formulir Pemesanan ==="
+    DO
+        CREATE PemesananCetak p
+        SET p.jenisCetak = pilihDariMenu(jenisCetakOpsi, "Pilih Jenis Cetak:")
+        PROMPT "Jumlah Cetak: "
+        READ p.jumlahCetak
+        SET p.finishing = pilihDariMenu(finishingOpsi, "Pilih Finishing:")
+        SET p.lokasi = pilihDariMenu(lokasiOpsi, "Pilih Lokasi Pengambilan:")
+        PROMPT "Keterangan (opsional): "
+        READ p.keterangan
+        PROMPT "Nama atau Path File yang ingin dicetak: "
+        READ p.fileCetak
+        SET p.username = session.username
+        SET p.id = dataPemesananCetak.size() + 1
+        ADD p TO dataPemesananCetak
+
+        PROMPT "Apakah Anda ingin menambahkan lagi pemesanan untuk pelanggan ini? (y/n): "
+        READ tambahLagi
+    WHILE tolower(tambahLagi) IS 'y'
+
+    DECLARE harganya = hitungHargaPesanan(dataPemesananCetak)
+    DO
+        PROMPT "Apakah mau booking sekalian? (y/n): "
+        READ pilihan_pengguna
+        IF pilihan_pengguna IS "y" THEN
+            SET isWithBooking = true
+            CALL booking(harganya)
+            BREAK
+    WHILE pilihan_pengguna IS NOT "n"
+
+    IF NOT isWithBooking THEN
+        PROMPT "Pilih Metode Pembayaran (1. Transfer Bank, 2. E-Wallet): "
+        READ metodeBayar
+        PROMPT "Pilih Metode Pengiriman (1. Kurir, 2. Ambil Ditempat): "
+        READ metodePengiriman
+
+        DISPLAY "===== PEMBAYARAN ====="
+        DISPLAY "Total Harga: Rp ", harganya
+
+        CREATE Pesanan p
+        SET p.id = dataPesanan.size() + 1
+        SET p.username = session.username
+        SET p.status = "pesanan diproses"
+        SET p.hargaTotal = harganya
+
+        CREATE Laporan_Keuangan lk
+        SET lk.harga = p.hargaTotal
+        SET lk.judul = "Cetak Tanpa Booking"
+        SET lk.username = session.username
+        SET lk.jenis = "Cetak"
+
+        CLEAR dataPemesananCetak
+        ADD p TO dataPesanan
+        ADD lk TO Kumpulan_Laporan_Keuangan
+
+        DISPLAY "Pesanan Sedang Diproses..."
+        PAUSE
+
+PROCEDURE tampilkanData()
+    IF dataPemesananCetak IS EMPTY THEN
+        DISPLAY "Belum ada data pemesanan."
+        RETURN
+
+    DISPLAY "=== Data Pemesanan ==="
+    DECLARE pelangganIndex = 1
+    FOR EACH pelanggan IN dataPemesananCetak
+        DISPLAY "Pelanggan #", pelanggan.username
+        DISPLAY "  Pemesanan #", pelangganIndex
+        DISPLAY "    Jenis Cetak: ", pelanggan.jenisCetak
+        DISPLAY "    Jumlah Cetak: ", pelanggan.jumlahCetak
+        DISPLAY "    Finishing: ", pelanggan.finishing
+        DISPLAY "    Lokasi: ", pelanggan.lokasi
+        DISPLAY "    Keterangan: ", IF pelanggan.keterangan IS EMPTY THEN "Tidak ada" ELSE pelanggan.keterangan
+        DISPLAY "    File Cetak: ", pelanggan.fileCetak
+        DISPLAY "-------------------------"
+        INCREMENT pelangganIndex
+
+PROCEDURE statusPesanan()
+    CALL CetakJudulAplikasi()
+
+    IF dataPesanan IS EMPTY THEN
+        DISPLAY "Belum ada pesanan yang dibuat."
+        RETURN
+
+    DISPLAY "=== Status Pemesanan ==="
+    FOR EACH pesanan IN dataPesanan
+        DECLARE status AS STRING
+        IF pesanan.status IS "pbk" THEN
+            SET status = "Belum Di Konfirmasi"
+        ELSE IF pesanan.status IS "ptlk" THEN
+            SET status = "Pesanan Ditolak"
+        ELSE
+            SET status = "Sudah Di Konfirmasi"
+
+        IF session.username IS pesanan.username THEN
+            DISPLAY "ID Pesanan: ", pesanan.id
+            DISPLAY "Nama Pemesan: ", pesanan.username
+            DISPLAY "Total Harga: Rp", pesanan.hargaTotal
+            DISPLAY "Status Pesanan: ", status
+            DISPLAY "Keterangan: ", pesanan.keterangan
+            DISPLAY "\n"
+    END FOR
+
+END PROCEDURE
+
+PROCEDURE konfirmasiPesanan()
+    IF dataPesanan IS EMPTY THEN
+        DISPLAY "Tidak ada pesanan untuk dikonfirmasi."
+        RETURN
+
+    DISPLAY "\n=== Konfirmasi Pesanan ==="
+    FOR EACH pesanan IN dataPesanan
+        DECLARE status AS STRING
+        SET status = (IF pesanan.status IS "pbk" THEN "Belum Di Konfirmasi" ELSE "Sudah Di Konfirmasi")
+        DISPLAY "ID Pesanan: ", pesanan.id
+        DISPLAY "Nama Pemesan: ", pesanan.username
+        DISPLAY "Total Harga: Rp", pesanan.hargaTotal
+        DISPLAY "Status Pesanan: ", status
+        DISPLAY "\n"
+
+    PROMPT "Masukkan ID pesanan yang ingin dikonfirmasi: "
+    READ idPesanan
+
+    DECLARE ditemukan AS BOOLEAN = false
+    FOR EACH pesanan IN dataPesanan
+        IF pesanan.id IS EQUAL TO PARSE_INT(idPesanan) THEN
+            SET ditemukan = true
+
+            IF pesanan.status IS "pbk" OR pesanan.status IS "ptlk" THEN
+                PROMPT "Apakah pesanan ini mau dikonfirmasi? (y/n): "
+                READ maukonfirmgak
+
+                IF maukonfirmgak IS "y" THEN
+                    SET pesanan.status = "pb"
+                    DISPLAY "Pesanan berhasil dikonfirmasi!"
+                ELSE
+                    PROMPT "Alasan ditolak: "
+                    READ alasannye_mas
+                    SET pesanan.status = "ptlk"
+                    SET pesanan.keterangan = alasannye_mas
+                    DISPLAY "Konfirmasi batal."
+
+            ELSE
+                DISPLAY "Pesanan dengan ID ", idPesanan, " tidak dalam status 'Menunggu Konfirmasi'."
+            END IF
+
+            BREAK
+    END FOR
+
+    IF NOT ditemukan THEN
+        DISPLAY "Pesanan dengan ID ", idPesanan, " tidak ditemukan."
+
+END PROCEDURE
+
+PROCEDURE tampilkanMenu()
+    DISPLAY "=== Menu Utama ==="
+    DISPLAY "1. Tambah Data Pelanggan"
+    DISPLAY "2. Hapus Data Pelanggan"
+    DISPLAY "3. Keluar"
+    PROMPT "Pilih opsi: "
+
+PROCEDURE tambahAkunAdmin(database_akun)
+    DECLARE adminBaru AS Akun
+    PROMPT "Masukkan Nama: "
+    READ adminBaru.nama
+    PROMPT "Masukkan Nomor Telepon: "
+    READ adminBaru.nomor_hp
+    PROMPT "Masukkan Username: "
+    READ adminBaru.username
+    PROMPT "Masukkan Password: "
+    READ adminBaru.password
+    SET adminBaru.role = Admin
+    SET adminBaru.id = database_akun.size + 1
+    ADD adminBaru TO database_akun
+    DISPLAY "Data berhasil ditambahkan!"
+    PAUSE
+
+PROCEDURE hapusAkun(dataPelanggan)
+    IF dataPelanggan IS EMPTY THEN
+        DISPLAY "Tidak ada data pelanggan untuk dihapus."
+        RETURN
+    PROMPT "Masukkan Nama pelanggan yang ingin dihapus: "
+    READ namaHapus
+    FOR EACH pelanggan IN dataPelanggan
+        IF pelanggan.nama == namaHapus THEN
+            REMOVE pelanggan FROM dataPelanggan
+            DISPLAY "Data berhasil dihapus!"
+            PAUSE
+            RETURN
+    DISPLAY "Nama pelanggan tidak ditemukan!"
+    PAUSE
+
+PROCEDURE lihatSemuaAkunPengguna(dataPelanggan)
+    IF dataPelanggan IS EMPTY THEN
+        DISPLAY "Tidak ada data pelanggan."
+        RETURN
+    DISPLAY "Daftar Pelanggan:"
+    FOR EACH pelanggan IN dataPelanggan
+        DISPLAY "Nama: ", pelanggan.nama
+        DISPLAY "Nomor Telepon: ", pelanggan.nomor_hp
+        DISPLAY "Username: ", pelanggan.username
+        DISPLAY "Password: ", pelanggan.password
+
+PROCEDURE TampilanLaporanKeuangan()
+    DISPLAY "===== LAPORAN KEUANGAN ====="
+    FOR EACH laporan IN Kumpulan_Laporan_Keuangan
+        DISPLAY "Username: ", laporan.username
+        DISPLAY "Nama Barang: ", laporan.username
+        DISPLAY "Harga: ", laporan.harga
+        DISPLAY "Jenis Laporan: ", laporan.jenis
+        DISPLAY "==========================================="
+    PAUSE
+
+PROCEDURE TampilanMenuUtamaAdmin()
+    CALL CetakJudulAplikasi()
+    DISPLAY "Selamat datang, ", session.nama
+    DISPLAY "1. Data Pelanggan"
+    DISPLAY "2. Manage Katalog"
+    DISPLAY "3. Laporan Keuangan"
+    DISPLAY "4. Konfirmasi Pemesanan"
+    DISPLAY "5. Logout"
+    PROMPT "Masukkan pilihan anda: "
+
+PROCEDURE TampilanMenuUtamaUser()
+    CALL CetakJudulAplikasi()
+    DISPLAY "Selamat datang, ", session.nama
+    DISPLAY "1. Lihat Katalog"
+    DISPLAY "2. Buat Pemesanan"
+    DISPLAY "3. Informasi Pemesanan"
+    DISPLAY "4. Logout"
+    PROMPT "Masukkan pilihan anda: "
+
+FUNCTION main()
+    WHILE NOT keluar
+        IF NOT isLogin THEN
+            CALL Tampilan_LoginRegister()
+        ELSE
+            IF session.role == Admin THEN
+                CALL TampilanMenuUtamaAdmin()
+                READ pilihan_pengguna
+                SWITCH pilihan_pengguna
+                    CASE "5":
+                        CALL LogoutLogic()
+                    CASE "3":
+                        CALL TampilanLaporanKeuangan()
+                    CASE "2":
+                        CALL manageCatalog(catalog)
+                    CASE "4":
+                        CALL statusPesanan()
+                    CASE "1":
+                        CALL CetakJudulAplikasi()
+                        CALL lihatSemuaAkunPengguna(Database_Akun)
+                        CALL tampilkanMenu()
+                        READ pilihan_pengguna
+                        SWITCH pilihan_pengguna
+                            CASE 1:
+                                CALL tambahAkunAdmin(Database_Akun)
+                            CASE 2:
+                                CALL hapusAkun(Database_Akun)
+                            CASE 3:
+                                BREAK
+                            DEFAULT:
+                                DISPLAY "Pilihan tidak valid. Coba lagi."
+                                PAUSE
+                    DEFAULT:
+                        DISPLAY "Pilihan tidak valid. Coba lagi."
+                        PAUSE
+            ELSE IF session.role == User THEN
+                CALL TampilanMenuUtamaUser()
+                READ pilihan_pengguna
+                SWITCH pilihan_pengguna
+                    CASE "1":
+                        CALL displayCatalog(catalog)
+                    CASE "2":
+                        CALL tambahPemesanan()
+                    CASE "4":
+                        CALL statusPesanan()
+                    CASE "5":
+                        CALL LogoutLogic()
+                    DEFAULT:
+                        DISPLAY "Pilihan tidak valid. Coba lagi."
+                        PAUSE
+            ELSE
+                DISPLAY "Invalid user role: ", session.role
+                PAUSE
+                CLEAR console
+                BREAK
+    DISPLAY "Program selesai."
+    RETURN 0

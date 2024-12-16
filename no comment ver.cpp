@@ -7,15 +7,6 @@
 
 using namespace std;
 
-#pragma region Super
-/**
- * @brief Fungsi untuk mencetak judul aplikasi.
- *
- * Fungsi ini membersihkan konsol, membersihkan isi varibel pilihan_pengguna dan buffer input, sekaligus mencetak judul aplikasi.
- * Ini juga mencetak garis pemisah untuk visualisasi yang lebih baik.
- *
- * @return void
- */
 void CetakJudulAplikasi()
 {
     system("cls");
@@ -44,7 +35,6 @@ struct PemesananCetak
     string fileCetak;
 };
 
-// Data pelanggan
 vector<PemesananCetak> dataPemesananCetak;
 
 struct Pesanan
@@ -53,7 +43,6 @@ struct Pesanan
     string username;
     int hargaTotal;
     string status;
-    string keterangan;
 };
 
 vector<Pesanan> dataPesanan;
@@ -68,29 +57,6 @@ struct Laporan_Kuangan
 
 vector<Laporan_Kuangan> Kumpulan_Laporan_Keuangan;
 
-#pragma endregion
-
-#pragma region Login, Logout, Register, dan Konfigurasi Akun (Baim)
-
-#pragma region Properti Akun
-// Struktur data yang disebut 'Akun' didefinisikan dalam C++.
-// Ini digunakan untuk mewakili akun pengguna dalam aplikasi Aplikasi Percetakan.
-// Struktur ini berisi berbagai bidang:
-//
-// - 'id': Variabel integer yang menyimapn id pengguna.
-// - 'nama': Variabel string yang menyimpan nama pengguna.
-// - 'nomor_hp': Variabel string yang menyimpan nomor telepon pengguna.
-// - 'username': Variabel string yang menyimpan nama pengguna yang unik.
-// - 'password': Variabel string yang menyimpan kata sandi pengguna.
-// - 'role': Variabel enum dari tipe 'Role' yang menunjukkan peran pengguna dalam aplikasi.
-// Enum 'Role' didefinisikan dalam kode sebagai 'Admin' dan 'User'.
-//
-// Struktur ini digunakan untuk membuat objek pengguna yang dapat disimpan dalam vektor,
-// seperti yang ditunjukkan dalam variabel 'Database_Akun'. Variabel 'Database_Akun' adalah koleksi pasangan,
-// di mana setiap pasangan terdiri dari integer (sebagai id) dan objek 'Akun'.
-// Hal ini memungkinkan penyimpanan dan pengambilan data akun pengguna dalam aplikasi secara efisien.
-
-// Digunakan untuk membuat level / role tiap akun
 enum Role
 {
     Admin = 0x1A1,
@@ -107,8 +73,6 @@ struct Akun
     Role role;
 };
 
-// Variabel Database_Akun adalah vektor of Akun yang digunakan untuk menyimpan data akun pengguna.
-// Variabel ini diinisialisasi dengan satu objek Akun yang berisi data admin.
 vector<Akun> Database_Akun = {
     {1, "Admin", "084277744102", "admin", "admin123", Admin},
     {1, "User", "084277744102", "user", "user123", User},
@@ -116,17 +80,6 @@ vector<Akun> Database_Akun = {
 
 Akun session; // Digunakan untuk menyimpan data akun saat sudah login
 
-#pragma endregion
-
-#pragma region Login Regiser Logout
-/**
- * @brief Fungsi ini bertanggung jawab atas logika logout aplikasi.
- *
- * Fungsi ini mengatur status login, menghapus data session, dan mengeset peran ke Null.
- * Ini dipanggil ketika pengguna memilih untuk logout.
- *
- * @return void
- */
 void LogoutLogic()
 {
     isLogin = false;
@@ -137,18 +90,7 @@ void LogoutLogic()
     session.role = Null;
 }
 
-/**
- * @brief Fungsi yang bertanggung jawab atas logika login aplikasi.
- *
- * Fungsi ini mencari username dan password yang sesuai di dalam database.
- * Jika username dan password cocok, fungsi ini akan menyimpan data akun ke dalam variabel 'session' dan mengembalikan nilai true.
- * Jika username dan password tidak cocok, fungsi ini akan mengembalikan nilai false.
- *
- * @param username Username yang dimasukkan pengguna.
- * @param password Password yang dimasukkan pengguna.
- *
- * @return bool Nilai true jika username dan password cocok, false jika tidak cocok.
- */
+
 bool LoginLogic(string username, string password)
 {
     // Cek username dan password di database
@@ -163,19 +105,7 @@ bool LoginLogic(string username, string password)
     return false;
 }
 
-/**
- * @brief Fungsi untuk menangani logika pendaftaran pengguna.
- *
- * Fungsi ini memeriksa apakah username yang diberikan sudah ada di database.
- * Jika username unik, fungsi ini akan membuat akun baru dengan detail yang diberikan dan menyimpannya ke database.
- *
- * @param nama Nama lengkap pengguna.
- * @param nomor_hp Nomor telepon pengguna.
- * @param username Username unik untuk pengguna.
- * @param password Kata sandi untuk pengguna.
- *
- * @return bool Mengembalikan true jika pendaftaran berhasil (username unik dan akun disimpan), false jika tidak.
- */
+
 bool RegisterLogic(string nama, string nomor_hp, string username, string password)
 {
     bool isUsernameExist = false;
@@ -286,12 +216,6 @@ void Tampilan_LoginRegister()
         }
     }
 }
-#pragma endregion
-
-#pragma endregion
-
-#pragma region Harga dan Katalog (Akmal)
-
 struct Item
 {
     string name;
@@ -364,10 +288,10 @@ void manageCatalog(vector<Item> &catalog)
         if (adminChoice == "1")
         {
             CetakJudulAplikasi();
-            displayCatalog();
+            displayCatalog(catalog);
             string item;
             cout << "Masukkan nama barang: ";
-            getline(cin, item);
+            cin >> item;
 
             int index = findItemIndex(catalog, item);
             if (index != -1)
@@ -382,13 +306,12 @@ void manageCatalog(vector<Item> &catalog)
                     getline(cin, restock);
                     if (restock == "1")
                     {
-                        string stock;
+                        int stock;
                         cout << "Masukkan jumlah stok: ";
-                        getline(cin, stock);
-                        catalog[index].stock += stoi(stock);
+                        cin >> stock;
+                        catalog[index].stock += stock;
                     }
                 }
-                system("pause");
             }
             else
             {
@@ -400,15 +323,17 @@ void manageCatalog(vector<Item> &catalog)
         {
             string item;
             cout << "Masukkan nama barang: ";
+            cin.clear();
+            cin.ignore();
             getline(cin, item);
 
             int index = findItemIndex(catalog, item);
             if (index != -1)
             {
+                int price;
                 cout << "Masukkan harga baru untuk " << item << ": ";
-                string price;
-                getline(cin, price);
-                catalog[index].price = stoi(price);
+                cin >> price;
+                catalog[index].price = price;
             }
             else
             {
@@ -420,13 +345,14 @@ void manageCatalog(vector<Item> &catalog)
         {
             string item;
             cout << "Masukkan nama barang: ";
+            cin.clear();
+            cin.ignore();
             getline(cin, item);
 
             int index = findItemIndex(catalog, item);
             if (index != -1)
             {
                 cout << "Harga " << item << ": " << catalog[index].price << endl;
-                system("pause");
             }
             else
             {
@@ -446,46 +372,6 @@ void manageCatalog(vector<Item> &catalog)
     }
 }
 
-// int main() {
-
-//     while (true) {
-//         cout << "\nSelamat Datang di Sistem Katalog" << endl;
-//         cout << "1. Pelanggan" << endl;
-//         cout << "2. Admin" << endl;
-//         cout << "3. Keluar" << endl;
-
-//         int userChoice;
-//         cout << "Masukkan pilihan: ";
-//         cin >> userChoice;
-
-//         if (userChoice == 1) {
-//             displayCatalog(catalog);
-//         } else if (userChoice == 2) {
-//             manageCatalog(catalog);
-//         } else if (userChoice == 3) {
-//             cout << "Terima kasih, sampai jumpa!" << endl;
-//             break;
-//         } else {
-//             cout << "Pilihan tidak valid, coba lagi." << endl;
-//         }
-//     }
-
-//     return 0;
-// }
-#pragma endregion
-
-#pragma region Informasi Pemesanan & Booking (Mahfud & Diandra)
-
-/**
- * @brief Menghitung total biaya pesanan cetak untuk pengguna tertentu.
- *
- * @param dataPemesananCetak Vektor yang berisi semua data pesanan cetak.
- *
- * @return Total biaya pesanan cetak untuk pengguna.
- *
- * @note Fungsi ini mengulangi data pesanan cetak, memeriksa apakah pesanan tersebut milik pengguna,
- * dan menghitung total biaya dengan mengalikan jumlah setiap pesanan cetak dengan harga per cetak.
- */
 int hitungHargaPesanan(vector<PemesananCetak> dataPemesananCetak)
 {
     int totalBiaya = 0;
@@ -513,14 +399,6 @@ void booking(int hargaCetakan)
     vector<int> hargaBarang;
     int indexItem = NULL;
 
-    // // Input nama file
-    // cout << "Masukkan nama file yang ingin dicetak: ";
-    // getline(cin, namaFile);
-    // cout << "Masukkan jumlah kertas yang ingin dicetak: ";
-    // cin.clear();
-    // cin >> jumlahKertas;
-
-    // Pilih barang tambahan
     char pilih;
     do
     {
@@ -648,7 +526,7 @@ void booking(int hargaCetakan)
     Pesanan p;
     p.id = dataPesanan.size() + 1;
     p.username = session.username;
-    p.status = "pbk"; // ah iya yang ini di copy aja sama yg diatas biar langsung bayar juga
+    p.status = "pesanan diproses"; // ah iya yang ini di copy aja sama yg diatas biar langsung bayar juga
     if (isWithBooking)
     {
 
@@ -667,15 +545,9 @@ void booking(int hargaCetakan)
     dataPesanan.push_back(p);
     Kumpulan_Laporan_Keuangan.push_back(lk);
 
-    // Konfirmasi
-    // REVIEW: Baim ubah langsung di proses aja.
     cout << "Pesanan Sedang Diproses...\n";
     system("pause");
 }
-#pragma endregion
-
-#pragma region Pemesanan (Yusuf)
-// Fungsi untuk menampilkan menu dan mengambil pilihan (main menu, sesuaikan saja)
 string pilihDariMenu(const vector<string> &opsi, const string &prompt)
 {
     int pilihan;
@@ -698,7 +570,6 @@ string pilihDariMenu(const vector<string> &opsi, const string &prompt)
     return opsi[pilihan - 1];
 }
 
-// Fungsi untuk menambah data pemesanan
 void tambahPemesanan()
 {
     char tambahLagi;
@@ -706,6 +577,7 @@ void tambahPemesanan()
     // Pilihan untuk jenis cetak
     vector<string> jenisCetakOpsi = {"Printcopy", "Fotocopy"};
     vector<string> finishingOpsi = {"None", "Laminating", "Staples", "Jilid"};
+    vector<string> lokasiOpsi = {"Tanah Baru, Beji", "Pondok Cina, Beji", "Depok Jaya, Pancoran Mas"};
 
     CetakJudulAplikasi();
     cout << "=== Formulir Pemesanan ===\n";
@@ -713,22 +585,17 @@ void tambahPemesanan()
     {
         PemesananCetak p;
 
-        // Pilih jenis cetak
         p.jenisCetak = pilihDariMenu(jenisCetakOpsi, "Pilih Jenis Cetak:");
 
-        // Jumlah cetak
         cout << "Jumlah Cetak: ";
         cin >> p.jumlahCetak;
         cin.ignore();
 
-        // Pilih finishing
         p.finishing = pilihDariMenu(finishingOpsi, "Pilih Finishing:");
 
-        // Pilih lokasi
-        // p.lokasi = pilihDariMenu(lokasiOpsi, "Pilih Lokasi Pengambilan:");
+        p.lokasi = pilihDariMenu(lokasiOpsi, "Pilih Lokasi Pengambilan:");
 
-        // Keterangan tambahan
-        cout << "Keterangan (opsional): "; // Bagian sini masalah, selalu ke skip (tolong fix :( )
+        cout << "Keterangan (opsional): ";
         cin.clear();
         cin.ignore();
         getline(cin, p.keterangan);
@@ -787,7 +654,7 @@ void tambahPemesanan()
         Pesanan p;
         p.id = dataPesanan.size() + 1;
         p.username = session.username;
-        p.status = "pbk"; // default value status
+        p.status = "pesanan diproses"; // default value status
         p.hargaTotal = harganya;
         Laporan_Kuangan lk;
         lk.harga = p.hargaTotal;
@@ -803,7 +670,6 @@ void tambahPemesanan()
     }
 }
 
-// Fungsi untuk menampilkan semua data pemesanan (sesuaikan untuk bagian admin buat admin konfirmasi pemesanan dan juga infromasi pemesanan andra)
 void tampilkanData()
 {
     if (dataPemesananCetak.empty())
@@ -827,10 +693,6 @@ void tampilkanData()
         cout << "-------------------------\n";
     }
 }
-
-#pragma endregion
-
-#pragma region Status Pesanan (Reza)
 void statusPesanan()
 {
     CetakJudulAplikasi();
@@ -839,33 +701,51 @@ void statusPesanan()
         cout << "Belum ada pesanan yang dibuat" << endl;
         return;
     }
-
     cout << "=== Status Pemesanan ===" << endl;
     for (const auto &pesanan : dataPesanan)
     {
-        string status = "";
-        if (pesanan.status == "pbk")
-        {
-            string status = "Belum Di Konfirmasi";
-        }
-        else if (pesanan.status == "ptlk")
-        {
-
-            string status = "Pesanan Ditolak";
-        }
-        else
-        {
-            string status = "Sudah Di Konfirmasi";
-        }
         if (session.username == pesanan.username)
         {
             cout << "ID Pesanan: " << pesanan.id << endl;
             cout << "Nama Pemesan: " << pesanan.username << endl;
             cout << "Total Harga: Rp" << pesanan.hargaTotal << endl;
-            cout << "Status Pesanan: " << status << endl;
-            cout << "Keterangan: " << pesanan.keterangan << endl;
+            cout << "Status Pesanan: " << pesanan.status << endl;
             cout << "\n";
         }
+    }
+
+    for (auto &pesanan : dataPesanan)
+    {
+        if (pesanan.status == "kosong")
+        {
+            pesanan.status = "menununggu dikonfirmasi";
+        }
+        else if (pesanan.status == "menunggu dikonfirmasi")
+        {
+            pesanan.status = "pesanan dikonfirmasi";
+        }
+        else if (pesanan.status == "pesanan dikonfirmasi")
+        {
+            pesanan.status = "menunggu pembayaran";
+        }
+        else if (pesanan.status == "menunggu pembayaran")
+        {
+            pesanan.status = "pesanan diproses";
+        }
+        else if (pesanan.status == "pesanan diproses")
+        { // akses data pesanan
+            pesanan.status = "pesanan selesai";
+        }
+    }
+
+    cout << "=== Update Status" << endl;
+    for (const auto &pesanan : dataPesanan)
+    {
+        cout << "ID Pesanan: " << pesanan.id << endl;
+        cout << "Nama Pemesan: " << pesanan.username << endl;
+        cout << "Total Harga: Rp" << pesanan.hargaTotal << endl;
+        cout << "Status Pesanan: " << pesanan.status << endl;
+        cout << "\n";
     }
 }
 
@@ -880,50 +760,29 @@ void konfirmasiPesanan()
     cout << "\n=== Konfirmasi Pesanan ===\n";
     for (const auto &pesanan : dataPesanan)
     {
-        string status = (pesanan.status == "pbk") ? "Belum Di Konfirmasi" : "Sudah Di Konfirmasi";
-        cout << "ID Pesanan: " << pesanan.id << endl;
-        cout << "Nama Pemesan: " << pesanan.username << endl;
-        cout << "Total Harga: Rp" << pesanan.hargaTotal << endl;
-        cout << "Status Pesanan: " << status << endl;
-        cout << "\n";
+        cout << "ID: " << pesanan.id
+             << ", Pelanggan: " << pesanan.username
+             << ", Status: " << pesanan.status << endl;
     }
 
-    string idPesanan;
+    int idPesanan;
     cout << "Masukkan ID pesanan yang ingin dikonfirmasi: ";
-    getline(cin, idPesanan);
+    cin >> idPesanan;
 
     bool ditemukan = false;
     for (auto &pesanan : dataPesanan)
     {
-        if (pesanan.id == stoi(idPesanan))
+        if (pesanan.id == idPesanan)
         {
             ditemukan = true;
-            if (pesanan.status == "pbk" && pesanan.status == "ptlk") // yang tanpa bo
+            if (pesanan.status == "menunggu konfirmasi") // yang tanpa bo
             {
-                string maukonfirmgak = "";
-                cout << "Apakah pesanan ini mau di konfirmasi? (y/n)";
-                getline(cin, maukonfirmgak);
-                if (maukonfirmgak == "y")
-                {
-                    pesanan.status = "pb";
-                    cout << "Pesanan berhasil di konfirmasi!" << endl;
-                    system("pause");
-                }
-                else
-                {
-                    string alasannye_mas = "";
-                    cout << "Alasan ditolak: ";
-                    getline(cin, alasannye_mas);
-                    pesanan.status = "ptlk";
-                    pesanan.keterangan = alasannye_mas;
-                    cout << "Konfirmasi batal.\n";
-                }
-                system("pause");
+                pesanan.status = "Pesanan Dikonfirmasi";
+                cout << "Pesanan dengan ID " << idPesanan << " telah dikonfirmasi.\n";
             }
             else
             {
                 cout << "Pesanan dengan ID " << idPesanan << " tidak dalam status 'Menunggu Konfirmasi'.\n";
-                system("pause");
             }
             break;
         }
@@ -932,39 +791,8 @@ void konfirmasiPesanan()
     if (!ditemukan)
     {
         cout << "Pesanan dengan ID " << idPesanan << " tidak ditemukan.\n";
-        system("pause");
     }
 }
-
-#pragma endregion
-
-#pragma region Informasi Pelanggan (Rian)
-
-// void inputDataAwal(vector<Akun> &dataPelanggan, int &idPelanggan)
-// {
-//     int jumlah;
-//     cout << "Masukkan jumlah data pelanggan awal: ";
-//     cin >> jumlah;
-//     cin.ignore(); // Mengabaikan newline setelah input jumlah
-
-//     for (int i = 0; i < jumlah; ++i)
-//     {
-//         Akun akunBarun;
-//         cout << "\nData pelanggan ke-" << (i + 1) << ":" << endl;
-//         cout << "Masukkan Nama: ";
-//         getline(cin, pelangganBaru.nama);
-//         cout << "Masukkan Nomor Telepon: ";
-//         getline(cin, pelangganBaru.nomorTelepon);
-//         cout << "Masukkan Username: ";
-//         getline(cin, pelangganBaru.username);
-//         cout << "Masukkan Password: ";
-//         getline(cin, pelangganBaru.password);
-
-//         dataPelanggan.push_back(pelangganBaru);
-//         idPelanggan++;
-//     }
-// }
-
 void tampilkanMenu()
 {
     cout << "\n=== Menu Utama ===" << endl;
@@ -1038,48 +866,6 @@ void lihatSemuaAkunPengguna(const vector<Akun> &dataPelanggan)
              << ", Password: " << pelanggan.password << endl;
     }
 }
-
-// int main() {
-//     vector<Akun> dataPelanggan;
-//     int idPelanggan = 1;
-//     int pilihan;
-
-//     inputDataAwal(dataPelanggan, idPelanggan);
-
-//     do {
-//         lihatSemuaAkunPelanggan(dataPelanggan);
-//         tampilkanMenu();
-//         cin >> pilihan;
-
-//         switch (pilihan) {
-//             case 1:
-//                 tambahAkunAdmin(dataPelanggan, idPelanggan);
-//                 break;
-//             case 2:
-//                 hapusAkun(dataPelanggan);
-//                 break;
-//             case 3:
-//                 cout << "Keluar dari program. Terima kasih!" << endl;
-//                 break;
-//             default:
-//                 cout << "Pilihan tidak valid. Coba lagi." << endl;
-//         }
-//     } while (pilihan != 3);
-
-//     return 0;
-// }
-#pragma endregion
-
-#pragma region Laporan Keuangan dan Konfirmasi Pemesanan (Dendy)
-/**
- * @brief Tampilkan laporan keuangan.
- *
- * Fungsi ini melakukan iterasi ke array / koleksi laporan keuangan, kemudian
- * mencetak hasil detilnya setiap laporan tersebut. Data laporannya yaitu username,
- * nama produk, harga total pembelian, dan jenis laporannya.
- *
- *  @return void
- */
 void TampilanLaporanKeuangan()
 {
     cout << "\n===== LAPORAN KEUANGAN =====\n";
@@ -1151,7 +937,7 @@ int main()
                 }
                 else if (pilihan_pengguna == "4")
                 {
-                    konfirmasiPesanan();
+                    statusPesanan();
                 }
                 else if (pilihan_pengguna == "1")
                 {
@@ -1221,4 +1007,3 @@ int main()
     cout << endl;
     return 0;
 }
-#pragma endregion // mantap ya line nya
