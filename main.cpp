@@ -25,9 +25,48 @@ void CetakJudulAplikasi()
     cout << endl;
 }
 
+const int biayaCetak = 5000;
+
 bool keluar = false;
 string pilihan_pengguna;
 bool isLogin = false;
+bool isWithBooking = false;
+
+struct PemesananCetak
+{
+    int id;
+    string username;
+    string jenisCetak;
+    int jumlahCetak;
+    string finishing;
+    string lokasi;
+    string keterangan;
+    string fileCetak;
+};
+
+// Data pelanggan
+vector<PemesananCetak> dataPemesananCetak;
+
+struct Pesanan
+{
+    int id;
+    string username;
+    int hargaTotal;
+    string status;
+};
+
+vector<Pesanan> dataPesanan;
+
+struct Laporan_Kuangan
+{
+    string username;
+    string judul;
+    int harga;
+    string jenis;
+};
+
+vector<Laporan_Kuangan> Kumpulan_Laporan_Keuangan;
+
 #pragma endregion
 
 #pragma region Login, Logout, Register, dan Konfigurasi Akun (Baim)
@@ -250,125 +289,6 @@ void Tampilan_LoginRegister()
 
 #pragma endregion
 
-#pragma region Pemesanan (Yusuf)
-
-struct Pemesanan
-{
-    string jenisCetak;
-    int jumlahCetak;
-    string finishing;
-    string lokasi;
-    string keterangan;
-    string fileCetak;
-};
-
-// Data pelanggan
-vector<vector<Pemesanan>> dataPemesanan;
-
-// Fungsi untuk menampilkan menu dan mengambil pilihan (main menu, sesuaikan saja)
-string pilihDariMenu(const vector<string> &opsi, const string &prompt)
-{
-    int pilihan;
-    cout << prompt << endl;
-    for (size_t i = 0; i < opsi.size(); ++i)
-    {
-        cout << i + 1 << ". " << opsi[i] << endl;
-    }
-
-    do
-    {
-        cout << "Pilih (1-" << opsi.size() << "): ";
-        cin >> pilihan;
-        if (pilihan < 1 || pilihan > static_cast<int>(opsi.size()))
-        {
-            cout << "Pilihan tidak valid, coba lagi." << endl;
-        }
-    } while (pilihan < 1 || pilihan > static_cast<int>(opsi.size()));
-
-    return opsi[pilihan - 1];
-}
-
-// Fungsi untuk menambah data pemesanan
-void tambahPemesanan()
-{
-    vector<Pemesanan> pemesananBaru;
-    char tambahLagi;
-
-    // Pilihan untuk jenis cetak
-    vector<string> jenisCetakOpsi = {"Printcopy", "Fotocopy", "Poster"};
-    vector<string> finishingOpsi = {"None", "Laminating", "Staples", "Jilid"};
-    vector<string> lokasiOpsi = {"Tanah Baru, Beji", "Pondok Cina, Beji", "Depok Jaya, Pancoran Mas"};
-
-    cout << "=== Formulir Pemesanan ===\n";
-    do
-    {
-        Pemesanan p;
-
-        // Pilih jenis cetak
-        p.jenisCetak = pilihDariMenu(jenisCetakOpsi, "Pilih Jenis Cetak:");
-
-        // Jumlah cetak
-        cout << "Jumlah Cetak: ";
-        cin >> p.jumlahCetak;
-        cin.ignore();
-
-        // Pilih finishing
-        p.finishing = pilihDariMenu(finishingOpsi, "Pilih Finishing:");
-
-        // Pilih lokasi
-        p.lokasi = pilihDariMenu(lokasiOpsi, "Pilih Lokasi Pengambilan:");
-
-        // Keterangan tambahan
-        cout << "Keterangan (opsional): "; // Bagian sini masalah, selalu ke skip (tolong fix :( )
-        getline(cin, p.keterangan);
-
-        // Input file cetak
-        cout << "Nama atau Path File yang ingin dicetak: ";
-        getline(cin, p.fileCetak);
-
-        pemesananBaru.push_back(p);
-
-        cout << "Apakah Anda ingin menambahkan lagi pemesanan untuk pelanggan ini? (y/n): ";
-        cin >> tambahLagi;
-        cin.ignore();
-
-    } while (tolower(tambahLagi) == 'y');
-
-    // Tambahkan pemesanan pelanggan ke data utama
-    dataPemesanan.push_back(pemesananBaru);
-}
-
-// Fungsi untuk menampilkan semua data pemesanan (sesuaikan untuk bagian admin buat admin konfirmasi pemesanan dan juga infromasi pemesanan andra)
-void tampilkanData()
-{
-    if (dataPemesanan.empty())
-    {
-        cout << "Belum ada data pemesanan.\n";
-        return;
-    }
-
-    cout << "=== Data Pemesanan ===\n";
-    int pelangganIndex = 1;
-    for (const auto &pelanggan : dataPemesanan)
-    {
-        cout << "Pelanggan #" << pelangganIndex++ << ":\n";
-        int pemesananIndex = 1;
-        for (const auto &p : pelanggan)
-        {
-            cout << "  Pemesanan #" << pemesananIndex++ << ":\n";
-            cout << "    Jenis Cetak: " << p.jenisCetak << "\n";
-            cout << "    Jumlah Cetak: " << p.jumlahCetak << "\n";
-            cout << "    Finishing: " << p.finishing << "\n";
-            cout << "    Lokasi: " << p.lokasi << "\n";
-            cout << "    Keterangan: " << (p.keterangan.empty() ? "Tidak ada" : p.keterangan) << "\n";
-            cout << "    File Cetak: " << p.fileCetak << "\n";
-            cout << "-------------------------\n";
-        }
-    }
-}
-
-#pragma endregion
-
 #pragma region Harga dan Katalog (Akmal)
 
 struct Item
@@ -383,9 +303,7 @@ vector<Item> catalog = {
     {"Pensil", 3000, 5},
     {"Buku Tulis", 10000, 8},
     {"Penghapus", 2000, 7},
-    {"Penggaris", 4000, 15},
-    {"Rambutan", 6000, 0}
-};
+    {"Penggaris", 4000, 15}};
 
 void displayCatalog(const vector<Item> &catalog)
 {
@@ -394,12 +312,27 @@ void displayCatalog(const vector<Item> &catalog)
     int nomor = 1;
     for (const auto &item : catalog)
     {
-        cout << nomor << ". " << item.name << " - Harga Rp" << item.price << " - Stok = " << item.stock << endl;
+        string stok = (item.stock != 0) ? to_string(item.stock) : "HABIS";
+        cout << nomor << ". " << item.name << " - Harga Rp." << item.price << " - Stok = " << stok << endl;
+        nomor++;
     }
     system("pause");
 }
 
-int findItemIndex(const vector<Item> catalog, const string itemName)
+void displayCatalog()
+{
+    CetakJudulAplikasi();
+    cout << "\n===== KATALOG BARANG =====\n";
+    int nomor = 1;
+    for (const auto &item : catalog)
+    {
+        string stok = (item.stock != 0) ? to_string(item.stock) : "HABIS";
+        cout << nomor << ". " << item.name << " - Harga Rp" << item.price << " - Stok = " << stok << endl;
+        nomor++;
+    }
+}
+
+int findItemIndex(vector<Item> catalog, string itemName)
 {
     int i = 0;
     for (Item item : catalog)
@@ -429,6 +362,7 @@ void manageCatalog(vector<Item> &catalog)
 
         if (adminChoice == "1")
         {
+            CetakJudulAplikasi();
             displayCatalog(catalog);
             string item;
             cout << "Masukkan nama barang: ";
@@ -451,7 +385,7 @@ void manageCatalog(vector<Item> &catalog)
                         cout << "Masukkan jumlah stok: ";
                         cin >> stock;
                         catalog[index].stock += stock;
-                    }   
+                    }
                 }
             }
             else
@@ -541,57 +475,130 @@ void manageCatalog(vector<Item> &catalog)
 // }
 #pragma endregion
 
-#pragma region Informasi Pemesanan (Diandra)
-// Fungsi untuk memproses pesanan
-void prosesPesanan()
+#pragma region Informasi Pemesanan & Booking (Mahfud & Diandra)
+
+int hitungHargaPesanan(vector<PemesananCetak> dataPemesananCetak)
 {
-    string namaFile;
-    int jumlahKertas, totalBiaya;
+    int totalBiaya = 0;
+    // Hitung total harga cetak
+    vector<int> tempPaperPriceVar;
+    for (auto pemesanan_percetakan : dataPemesananCetak)
+    {
+        if (pemesanan_percetakan.username == session.username)
+        {
+            tempPaperPriceVar.push_back(pemesanan_percetakan.jumlahCetak);
+        }
+    }
+    for (int jumplahCetak : tempPaperPriceVar)
+    {
+        totalBiaya += jumplahCetak * biayaCetak;
+    }
+    return totalBiaya;
+}
+
+void booking(int hargaCetakan)
+{
+    int jumlahKertas;
+
     vector<string> keranjangBarang;
     vector<int> hargaBarang;
+    int indexItem = NULL;
 
-    // Biaya cetak
-    const int biayaCetak = 5000;
-
-    // Input nama file
-    cout << "Masukkan nama file yang ingin dicetak: ";
-    cin >> namaFile;
-    cout << "Masukkan jumlah kertas yang ingin dicetak: ";
-    cin >> jumlahKertas;
-
-    totalBiaya = biayaCetak * jumlahKertas;
+    // // Input nama file
+    // cout << "Masukkan nama file yang ingin dicetak: ";
+    // getline(cin, namaFile);
+    // cout << "Masukkan jumlah kertas yang ingin dicetak: ";
+    // cin.clear();
+    // cin >> jumlahKertas;
 
     // Pilih barang tambahan
     char pilih;
     do
     {
-        displayCatalog(catalog);
+        displayCatalog();
         int nomorBarang;
+        string namaBarang;
 
         cout << "Pilih nomor barang (0 untuk selesai): ";
+        cin.ignore();
         cin >> nomorBarang;
 
         switch (nomorBarang)
         {
         case 1:
-            keranjangBarang.push_back("Pulpen");
-            hargaBarang.push_back(5000);
+            namaBarang = "Pulpen";
+            indexItem = findItemIndex(catalog, namaBarang);
+            if (catalog.at(indexItem).stock > 0)
+            {
+                keranjangBarang.push_back(namaBarang);
+                hargaBarang.push_back(catalog[indexItem].price);
+                catalog.at(indexItem).stock -= 1;
+            }
+            else
+            {
+                cout << "Maaf stok telah habis!" << endl;
+                system("pause");
+            }
             break;
         case 2:
-            keranjangBarang.push_back("Pensil");
-            hargaBarang.push_back(3000);
+            namaBarang = "Pensil";
+            indexItem = findItemIndex(catalog, namaBarang);
+            if (catalog.at(indexItem).stock > 0)
+            {
+                keranjangBarang.push_back(namaBarang);
+                hargaBarang.push_back(catalog[indexItem].price);
+                catalog.at(indexItem).stock -= 1;
+            }
+            else
+            {
+                cout << "Maaf stok telah habis!" << endl;
+                system("pause");
+            }
             break;
         case 3:
-            keranjangBarang.push_back("Buku Tulis");
-            hargaBarang.push_back(10000);
+            namaBarang = "Buku Tulis";
+            indexItem = findItemIndex(catalog, namaBarang);
+            if (catalog.at(indexItem).stock > 0)
+            {
+                keranjangBarang.push_back(namaBarang);
+                hargaBarang.push_back(catalog[indexItem].price);
+                catalog.at(indexItem).stock -= 1;
+            }
+            else
+            {
+                cout << "Maaf stok telah habis!" << endl;
+                system("pause");
+            }
             break;
         case 4:
-            keranjangBarang.push_back("Penghapus");
-            hargaBarang.push_back(2000);
+            namaBarang = "Penghapus";
+            indexItem = findItemIndex(catalog, namaBarang);
+            if (catalog.at(indexItem).stock > 0)
+            {
+                keranjangBarang.push_back(namaBarang);
+                hargaBarang.push_back(catalog[indexItem].price);
+                catalog.at(indexItem).stock -= 1;
+            }
+            else
+            {
+                cout << "Maaf stok telah habis!" << endl;
+                system("pause");
+            }
             break;
         case 5:
-            keranjangBarang.push_back("Penggaris");
-            hargaBarang.push_back(4000);
+            namaBarang = "Penggaris";
+            indexItem = findItemIndex(catalog, namaBarang);
+            if (catalog.at(indexItem).stock > 0)
+            {
+                keranjangBarang.push_back(namaBarang);
+                hargaBarang.push_back(catalog[indexItem].price);
+                catalog.at(indexItem).stock -= 1;
+            }
+            else
+            {
+                cout << "Maaf stok telah habis!" << endl;
+                system("pause");
+            }
             break;
         }
 
@@ -600,10 +607,7 @@ void prosesPesanan()
     } while (pilih == 'y' || pilih == 'Y');
 
     // Hitung total harga
-    int totalHarga = totalBiaya;
-    cout << "\n===== DETAIL PESANAN =====\n";
-    cout << "File Cetak: " << namaFile << endl;
-    cout << "Biaya Cetak: Rp " << totalBiaya << endl;
+    int totalHarga = 0;
 
     cout << "Barang Tambahan:\n";
     for (int i = 0; i < keranjangBarang.size(); i++)
@@ -630,67 +634,210 @@ void prosesPesanan()
 
     // Total harga
     cout << "\n===== PEMBAYARAN =====\n";
-    cout << "Total Harga: Rp " << totalHarga << endl;
+    cout << "Total Harga: Rp " << totalHarga+hargaCetakan << endl;
 
-    // Konfirmasi
-    char konfirmasi;
-    cout << "Lanjutkan pembayaran? (y/n): ";
-    cin >> konfirmasi;
-
-    if (konfirmasi == 'y' || konfirmasi == 'Y')
+    Pesanan p;
+    p.id = dataPesanan.size() + 1;
+    p.username = session.username;
+    p.status = "NO";
+    if (isWithBooking)
     {
-        cout << "Pesanan Sedang Diproses...\n";
+
+        p.hargaTotal = totalHarga + hargaCetakan;
+        isWithBooking = false;
     }
     else
     {
-        cout << "Pesanan Dibatalkan\n";
+        p.hargaTotal = totalHarga;
+    }
+    dataPesanan.push_back(p);
+
+    // Konfirmasi
+    // REVIEW: Baim ubah langsung di proses aja.
+    cout << "Pesanan Sedang Diproses...\n";
+    system("pause");
+}
+#pragma endregion
+
+#pragma region Pemesanan (Yusuf)
+// Fungsi untuk menampilkan menu dan mengambil pilihan (main menu, sesuaikan saja)
+string pilihDariMenu(const vector<string> &opsi, const string &prompt)
+{
+    int pilihan;
+    cout << prompt << endl;
+    for (size_t i = 0; i < opsi.size(); ++i)
+    {
+        cout << i + 1 << ". " << opsi[i] << endl;
+    }
+
+    do
+    {
+        cout << "Pilih (1-" << opsi.size() << "): ";
+        cin >> pilihan;
+        if (pilihan < 1 || pilihan > static_cast<int>(opsi.size()))
+        {
+            cout << "Pilihan tidak valid, coba lagi." << endl;
+        }
+    } while (pilihan < 1 || pilihan > static_cast<int>(opsi.size()));
+
+    return opsi[pilihan - 1];
+}
+
+// Fungsi untuk menambah data pemesanan
+void tambahPemesanan()
+{
+    char tambahLagi;
+
+    // Pilihan untuk jenis cetak
+    vector<string> jenisCetakOpsi = {"Printcopy", "Fotocopy"};
+    vector<string> finishingOpsi = {"None", "Laminating", "Staples", "Jilid"};
+    vector<string> lokasiOpsi = {"Tanah Baru, Beji", "Pondok Cina, Beji", "Depok Jaya, Pancoran Mas"};
+
+    CetakJudulAplikasi();
+    cout << "=== Formulir Pemesanan ===\n";
+    do
+    {
+        PemesananCetak p;
+
+        // Pilih jenis cetak
+        p.jenisCetak = pilihDariMenu(jenisCetakOpsi, "Pilih Jenis Cetak:");
+
+        // Jumlah cetak
+        cout << "Jumlah Cetak: ";
+        cin >> p.jumlahCetak;
+        cin.ignore();
+
+        // Pilih finishing
+        p.finishing = pilihDariMenu(finishingOpsi, "Pilih Finishing:");
+
+        // Pilih lokasi
+        p.lokasi = pilihDariMenu(lokasiOpsi, "Pilih Lokasi Pengambilan:");
+
+        // Keterangan tambahan
+        cout << "Keterangan (opsional): "; // Bagian sini masalah, selalu ke skip (tolong fix :( )
+        cin.clear();
+        cin.ignore();
+        getline(cin, p.keterangan);
+
+        // Input file cetak
+        cout << "Nama atau Path File yang ingin dicetak: ";
+        getline(cin, p.fileCetak);
+
+        p.username = session.username;
+        p.id = dataPemesananCetak.size() + 1;
+
+        dataPemesananCetak.push_back(p);
+
+        cout << "Apakah Anda ingin menambahkan lagi pemesanan untuk pelanggan ini? (y/n): ";
+        cin >> tambahLagi;
+        cin.ignore();
+
+    } while (tolower(tambahLagi) == 'y');
+
+    int harganya = hitungHargaPesanan(dataPemesananCetak);
+    do
+    {
+        CetakJudulAplikasi();
+        cout << "Apakah mau booking sekalian? (y/n)" << endl;
+        getline(cin, pilihan_pengguna);
+        if (pilihan_pengguna == "y")
+        {
+            isWithBooking = true;
+            booking(harganya);
+            break;
+        }
+    } while (pilihan_pengguna != "n");
+
+    if (!isWithBooking)
+    {
+        Pesanan p;
+        p.id = dataPesanan.size() + 1;
+        p.username = session.username;
+        p.status = "NO";
+        p.hargaTotal = harganya;
+        dataPemesananCetak.clear();
+        dataPesanan.push_back(p);
+        Laporan_Kuangan lk;
+        lk.harga = p.hargaTotal;
+        lk.judul = "Cetak Tanpa Booking";
+        lk.username = session.username;
     }
 }
+
+// Fungsi untuk menampilkan semua data pemesanan (sesuaikan untuk bagian admin buat admin konfirmasi pemesanan dan juga infromasi pemesanan andra)
+void tampilkanData()
+{
+    if (dataPemesananCetak.empty())
+    {
+        cout << "Belum ada data pemesanan.\n";
+        return;
+    }
+
+    cout << "=== Data Pemesanan ===\n";
+    int pelangganIndex = 1;
+    for (const auto &pelanggan : dataPemesananCetak)
+    {
+        cout << "Pelanggan #" << pelanggan.username << ":\n";
+        cout << "  Pemesanan #" << pelangganIndex++ << ":\n";
+        cout << "    Jenis Cetak: " << pelanggan.jenisCetak << "\n";
+        cout << "    Jumlah Cetak: " << pelanggan.jumlahCetak << "\n";
+        cout << "    Finishing: " << pelanggan.finishing << "\n";
+        cout << "    Lokasi: " << pelanggan.lokasi << "\n";
+        cout << "    Keterangan: " << (pelanggan.keterangan.empty() ? "Tidak ada" : pelanggan.keterangan) << "\n";
+        cout << "    File Cetak: " << pelanggan.fileCetak << "\n";
+        cout << "-------------------------\n";
+    }
+}
+
 #pragma endregion
 
 #pragma region Status Pesanan (Reza)
 
 void statusPesanan()
 {
-    string status = "  ";
+    if (dataPesanan.empty())
+    {
+        cout << "Belum ada pesanan yang dibuat" << endl;
+        return;
+    }
+
+    cout << "=== Status Pemesanan ===" << endl;
+    for (const auto &pesanan : dataPesanan) {
+        cout << "ID Pesanan: " << pesanan.id << endl;
+        cout << "Nama pemesan: " << pesanan.username << endl;
+        cout << "Total Harga: Rp" << pesanan.hargaTotal << endl;
+        cout << 
+    }
 }
 
 #pragma endregion
 
 #pragma region Informasi Pelanggan (Rian)
 
-struct Pelanggan
-{
-    string nama;
-    string nomorTelepon;
-    string username;
-    string password;
-};
+// void inputDataAwal(vector<Akun> &dataPelanggan, int &idPelanggan)
+// {
+//     int jumlah;
+//     cout << "Masukkan jumlah data pelanggan awal: ";
+//     cin >> jumlah;
+//     cin.ignore(); // Mengabaikan newline setelah input jumlah
 
-void inputDataAwal(vector<Pelanggan> &dataPelanggan, int &idPelanggan)
-{
-    int jumlah;
-    cout << "Masukkan jumlah data pelanggan awal: ";
-    cin >> jumlah;
-    cin.ignore(); // Mengabaikan newline setelah input jumlah
+//     for (int i = 0; i < jumlah; ++i)
+//     {
+//         Akun akunBarun;
+//         cout << "\nData pelanggan ke-" << (i + 1) << ":" << endl;
+//         cout << "Masukkan Nama: ";
+//         getline(cin, pelangganBaru.nama);
+//         cout << "Masukkan Nomor Telepon: ";
+//         getline(cin, pelangganBaru.nomorTelepon);
+//         cout << "Masukkan Username: ";
+//         getline(cin, pelangganBaru.username);
+//         cout << "Masukkan Password: ";
+//         getline(cin, pelangganBaru.password);
 
-    for (int i = 0; i < jumlah; ++i)
-    {
-        Pelanggan pelangganBaru;
-        cout << "\nData pelanggan ke-" << (i + 1) << ":" << endl;
-        cout << "Masukkan Nama: ";
-        getline(cin, pelangganBaru.nama);
-        cout << "Masukkan Nomor Telepon: ";
-        getline(cin, pelangganBaru.nomorTelepon);
-        cout << "Masukkan Username: ";
-        getline(cin, pelangganBaru.username);
-        cout << "Masukkan Password: ";
-        getline(cin, pelangganBaru.password);
-
-        dataPelanggan.push_back(pelangganBaru);
-        idPelanggan++;
-    }
-}
+//         dataPelanggan.push_back(pelangganBaru);
+//         idPelanggan++;
+//     }
+// }
 
 void tampilkanMenu()
 {
@@ -701,24 +848,26 @@ void tampilkanMenu()
     cout << "Pilih opsi: ";
 }
 
-void tambahPelanggan(vector<Pelanggan> &dataPelanggan, int &idPelanggan)
+void tambahAkunAdmin(vector<Akun> &database_akun)
 {
-    Pelanggan pelangganBaru;
+    Akun adminBaru;
     cout << "Masukkan Nama: ";
     cin.ignore();
-    getline(cin, pelangganBaru.nama);
+    getline(cin, adminBaru.nama);
     cout << "Masukkan Nomor Telepon: ";
-    getline(cin, pelangganBaru.nomorTelepon);
+    getline(cin, adminBaru.nomor_hp);
     cout << "Masukkan Username: ";
-    getline(cin, pelangganBaru.username);
+    getline(cin, adminBaru.username);
     cout << "Masukkan Password: ";
-    getline(cin, pelangganBaru.password);
-
-    dataPelanggan.push_back(pelangganBaru);
+    getline(cin, adminBaru.password);
+    adminBaru.role = Admin;
+    adminBaru.id = database_akun.size() + 1;
+    database_akun.push_back(adminBaru);
     cout << "Data berhasil ditambahkan!" << endl;
+    system("pause");
 }
 
-void hapusPelanggan(vector<Pelanggan> &dataPelanggan)
+void hapusAkun(vector<Akun> &dataPelanggan)
 {
     if (dataPelanggan.empty())
     {
@@ -737,14 +886,16 @@ void hapusPelanggan(vector<Pelanggan> &dataPelanggan)
         {
             dataPelanggan.erase(it);
             cout << "Data berhasil dihapus!" << endl;
+            system("pause");
             return;
         }
     }
 
     cout << "Nama pelanggan tidak ditemukan!" << endl;
+    system("pause");
 }
 
-void lihatSemuaPelanggan(const vector<Pelanggan> &dataPelanggan)
+void lihatSemuaAkunPengguna(const vector<Akun> &dataPelanggan)
 {
     if (dataPelanggan.empty())
     {
@@ -756,30 +907,30 @@ void lihatSemuaPelanggan(const vector<Pelanggan> &dataPelanggan)
     for (const auto &pelanggan : dataPelanggan)
     {
         cout << "Nama: " << pelanggan.nama
-             << ", Nomor Telepon: " << pelanggan.nomorTelepon
+             << ", Nomor Telepon: " << pelanggan.nomor_hp
              << ", Username: " << pelanggan.username
              << ", Password: " << pelanggan.password << endl;
     }
 }
 
 // int main() {
-//     vector<Pelanggan> dataPelanggan;
+//     vector<Akun> dataPelanggan;
 //     int idPelanggan = 1;
 //     int pilihan;
 
 //     inputDataAwal(dataPelanggan, idPelanggan);
 
 //     do {
-//         lihatSemuaPelanggan(dataPelanggan);
+//         lihatSemuaAkunPelanggan(dataPelanggan);
 //         tampilkanMenu();
 //         cin >> pilihan;
 
 //         switch (pilihan) {
 //             case 1:
-//                 tambahPelanggan(dataPelanggan, idPelanggan);
+//                 tambahAkunAdmin(dataPelanggan, idPelanggan);
 //                 break;
 //             case 2:
-//                 hapusPelanggan(dataPelanggan);
+//                 hapusAkun(dataPelanggan);
 //                 break;
 //             case 3:
 //                 cout << "Keluar dari program. Terima kasih!" << endl;
@@ -794,19 +945,6 @@ void lihatSemuaPelanggan(const vector<Pelanggan> &dataPelanggan)
 #pragma endregion
 
 #pragma region Laporan Keuangan dan Konfirmasi Pemesanan (Dendy)
-struct Laporan_Kuangan
-{
-    string username;
-    string judul;
-    int harga;
-    string jenis;
-};
-
-vector<Laporan_Kuangan> Kumpulan_Laporan_Keuangan = {
-    {"admin", "Beli Barang", 7000, "Barang"},
-    {"admin", "Cetakan", 7000, "Katalog"},
-};
-
 void TampilanLaporanKeuangan()
 {
     cout << "\n===== LAPORAN KEUANGAN =====\n";
@@ -843,8 +981,9 @@ void TampilanMenuUtamaUser()
     cout << "Selamat datang, " << session.nama << "!" << endl;
     cout << "1. Lihat Katalog" << endl;
     cout << "2. Buat Pemesanan" << endl;
-    cout << "3. Status Pemesanan" << endl;
-    cout << "4. Logout" << endl;
+    cout << "3. Informasi Pemesanan" << endl;
+    cout << "4. Status Pemesanan" << endl;
+    cout << "5. Logout" << endl;
     cout << "Masukkan pilihan anda: \n>> ";
 }
 #pragma endregion
@@ -876,6 +1015,34 @@ int main()
                 {
                     manageCatalog(catalog);
                 }
+                else if (pilihan_pengguna == "1")
+                {
+                    CetakJudulAplikasi();
+                    lihatSemuaAkunPengguna(Database_Akun);
+                    tampilkanMenu();
+                    cin.clear();
+                    cin >> pilihan_pengguna;
+
+                    switch (stoi(pilihan_pengguna))
+                    {
+                    case 1:
+                        tambahAkunAdmin(Database_Akun);
+                        break;
+                    case 2:
+                        hapusAkun(Database_Akun);
+                        break;
+                    case 3:
+                        break;
+                    default:
+                        cout << "Pilihan tidak valid. Coba lagi." << endl;
+                        system("pause");
+                    }
+                }
+                else
+                {
+                    cout << "Pilihan tidak valid. Coba lagi." << endl;
+                    system("pause");
+                }
             }
             else if (session.role == User)
             {
@@ -887,18 +1054,20 @@ int main()
                 }
                 else if (pilihan_pengguna == "2")
                 {
-                    prosesPesanan();
+                    tambahPemesanan();
                 }
-                else if (pilihan_pengguna == "3")
+                else if (pilihan_pengguna == "4")
                 {
                     statusPesanan();
                 }
-                else if (pilihan_pengguna == "4")
+                else if (pilihan_pengguna == "5")
                 {
                     LogoutLogic();
                 }
                 else
                 {
+                    cout << "Pilihan tidak valid. Coba lagi." << endl;
+                    system("pause");
                 }
             }
             else
