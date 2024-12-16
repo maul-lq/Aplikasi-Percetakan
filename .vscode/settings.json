@@ -6,7 +6,6 @@
         "**/cache/": true
     },
     "files.associations": {
-        "*.ejs": "html",
         "map": "cpp",
         "xstring": "cpp",
         "vector": "cpp",
