@@ -70,7 +70,7 @@ vector<Laporan_Kuangan> Kumpulan_Laporan_Keuangan;
 
 #pragma endregion
 
-#pragma region Login, Logout, Register, dan Konfigurasi Akun (Baim)
+#pragma region
 
 #pragma region Properti Akun
 // Struktur data yang disebut 'Akun' didefinisikan dalam C++.
@@ -758,7 +758,7 @@ void tambahPemesanan()
         { // jadi satu ny ada di sini
             isWithBooking = true;
             booking(harganya);
-            break;
+            return;
         }
     } while (pilihan_pengguna != "n");
 
@@ -837,28 +837,29 @@ void statusPesanan()
     if (dataPesanan.empty())
     {
         cout << "Belum ada pesanan yang dibuat" << endl;
+        system("pause");
         return;
     }
 
     cout << "=== Status Pemesanan ===" << endl;
     for (const auto &pesanan : dataPesanan)
     {
-        string status = "";
-        if (pesanan.status == "pbk")
-        {
-            string status = "Belum Di Konfirmasi";
-        }
-        else if (pesanan.status == "ptlk")
-        {
-
-            string status = "Pesanan Ditolak";
-        }
-        else
-        {
-            string status = "Sudah Di Konfirmasi";
-        }
         if (session.username == pesanan.username)
         {
+            string status = "";
+            if (pesanan.status == "pbk")
+            {
+                status = "Belum Di Konfirmasi";
+            }
+            else if (pesanan.status == "ptlk")
+            {
+
+                status = "Pesanan Ditolak";
+            }
+            else
+            {
+                status = "Sudah Di Konfirmasi";
+            }
             cout << "ID Pesanan: " << pesanan.id << endl;
             cout << "Nama Pemesan: " << pesanan.username << endl;
             cout << "Total Harga: Rp" << pesanan.hargaTotal << endl;
@@ -867,6 +868,7 @@ void statusPesanan()
             cout << "\n";
         }
     }
+    system("pause");
 }
 
 void konfirmasiPesanan()
@@ -898,7 +900,7 @@ void konfirmasiPesanan()
         if (pesanan.id == stoi(idPesanan))
         {
             ditemukan = true;
-            if (pesanan.status == "pbk" && pesanan.status == "ptlk") // yang tanpa bo
+            if (pesanan.status == "pbk" || pesanan.status == "ptlk") // yang tanpa bo
             {
                 string maukonfirmgak = "";
                 cout << "Apakah pesanan ini mau di konfirmasi? (y/n)";
@@ -1194,11 +1196,11 @@ int main()
                 {
                     tambahPemesanan();
                 }
-                else if (pilihan_pengguna == "4")
+                else if (pilihan_pengguna == "3")
                 {
                     statusPesanan();
                 }
-                else if (pilihan_pengguna == "5")
+                else if (pilihan_pengguna == "4")
                 {
                     LogoutLogic();
                 }
