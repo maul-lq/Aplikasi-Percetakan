@@ -30,6 +30,8 @@ const int biayaCetak = 5000;
 bool keluar = false;
 string pilihan_pengguna;
 bool isLogin = false;
+// digunakan untuk mentimpan sinya, kalau password ingin ditampilkan
+pair<int, bool> PVSig = {0, false};
 bool isWithBooking = false;
 
 struct PemesananCetak
@@ -111,7 +113,7 @@ struct Akun
 // Variabel ini diinisialisasi dengan satu objek Akun yang berisi data admin.
 vector<Akun> Database_Akun = {
     {1, "Admin", "084277744102", "admin", "admin123", Admin},
-    {1, "User", "084277744102", "user", "user123", User},
+    {2, "User", "084277744102", "user", "user123", User},
 };
 
 Akun session; // Digunakan untuk menyimpan data akun saat sudah login
@@ -964,21 +966,22 @@ void hapusAkun(vector<Akun> &dataPelanggan)
     system("pause");
 }
 
-void lihatSemuaAkunPengguna(const vector<Akun> &dataPelanggan)
+void lihatSemuaAkunPengguna(const vector<Akun> &databaseAkun)
 {
-    if (dataPelanggan.empty())
+    if (databaseAkun.empty())
     {
         cout << "Tidak ada data pelanggan." << endl;
         return;
     }
 
     cout << "\nDaftar Pelanggan:" << endl;
-    for (const auto &pelanggan : dataPelanggan)
+    for (const auto &akun : databaseAkun)
     {
-        cout << "Nama: " << pelanggan.nama
-             << ", Nomor Telepon: " << pelanggan.nomor_hp
-             << ", Username: " << pelanggan.username
-             << ", Password: " << pelanggan.password << endl;
+        string password = (PVSig.second) ? akun.password : "*****";
+        cout << "Nama: " << akun.nama
+             << ", Nomor Telepon: " << akun.nomor_hp
+             << ", Username: " << akun.username
+             << ", Password: " << password << endl;
     }
 }
 #pragma endregion
@@ -1087,6 +1090,17 @@ int main()
                     default:
                         cout << "Pilihan tidak valid. Coba lagi." << endl;
                         system("pause");
+                    }
+                }
+                else if (pilihan_pengguna == "v")
+                {
+                    if (PVSig.first == 0)
+                    {
+                        PVSig = {1, true};
+                    }
+                    else
+                    {
+                        PVSig = {0, false};
                     }
                 }
                 else
