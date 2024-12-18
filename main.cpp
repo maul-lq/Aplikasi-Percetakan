@@ -487,26 +487,19 @@ void booking(int hargaCetakan)
     vector<int> hargaBarang;
     int indexItem = None;
 
-    // // Input nama file
-    // cout << "Masukkan nama file yang ingin dicetak: ";
-    // getline(cin, namaFile);
-    // cout << "Masukkan jumlah kertas yang ingin dicetak: ";
-    // cin.clear();
-    // cin >> jumlahKertas;
-
     // Pilih barang tambahan
     char pilih;
     do
     {
         displayCatalog();
-        int nomorBarang;
+        string nomorBarang;
         string namaBarang;
 
         cout << "Pilih nomor barang (0 untuk selesai): ";
         cin.ignore();
-        cin >> nomorBarang;
+        getline(cin, nomorBarang);
 
-        switch (nomorBarang)
+        switch (stoi(nomorBarang))
         {
         case 1:
             namaBarang = "Pulpen";
@@ -990,7 +983,7 @@ void lihatSemuaAkunPengguna(const vector<Akun> &dataPelanggan)
 }
 #pragma endregion
 
-#pragma region Laporan Keuangan dan Konfirmasi Pemesanan (Dendy)
+#pragma region Laporan Keuangan (Dendy)
 /**
  * @brief Tampilkan laporan keuangan.
  *
@@ -1079,7 +1072,7 @@ int main()
                     lihatSemuaAkunPengguna(Database_Akun);
                     tampilkanMenu();
                     cin.clear();
-                    cin >> pilihan_pengguna;
+                    getline(cin, pilihan_pengguna);
 
                     switch (stoi(pilihan_pengguna))
                     {

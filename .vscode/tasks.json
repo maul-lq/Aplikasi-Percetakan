@@ -9,7 +9,7 @@
                 "/EHsc",
                 "/nologo",
                 "/Fe${fileDirname}\\bin\\Percetakan Online.exe",
-                "${file}"
+                "main.cpp"
             ],
             "options": {
                 "cwd": "${fileDirname}"
@@ -32,7 +32,7 @@
                 "/EHsc",
                 "/nologo",
                 "/Fe${fileDirname}\\bin\\test\\${fileBasenameNoExtension}.exe",
-                "${file}"
+                "main.test.cpp"
             ],
             "options": {
                 "cwd": "${fileDirname}"
