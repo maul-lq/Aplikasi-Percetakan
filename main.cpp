@@ -95,7 +95,7 @@ enum Role
 {
     Admin = 0x1A1,
     User = 0x1A2,
-    Null = 0x100
+    None = 0x100
 };
 struct Akun
 {
@@ -122,7 +122,7 @@ Akun session; // Digunakan untuk menyimpan data akun saat sudah login
 /**
  * @brief Fungsi ini bertanggung jawab atas logika logout aplikasi.
  *
- * Fungsi ini mengatur status login, menghapus data session, dan mengeset peran ke Null.
+ * Fungsi ini mengatur status login, menghapus data session, dan mengeset peran ke None.
  * Ini dipanggil ketika pengguna memilih untuk logout.
  *
  * @return void
@@ -134,7 +134,7 @@ void LogoutLogic()
     session.nomor_hp = "";
     session.username = "";
     session.password = "";
-    session.role = Null;
+    session.role = None;
 }
 
 /**
@@ -446,32 +446,6 @@ void manageCatalog(vector<Item> &catalog)
     }
 }
 
-// int main() {
-
-//     while (true) {
-//         cout << "\nSelamat Datang di Sistem Katalog" << endl;
-//         cout << "1. Pelanggan" << endl;
-//         cout << "2. Admin" << endl;
-//         cout << "3. Keluar" << endl;
-
-//         int userChoice;
-//         cout << "Masukkan pilihan: ";
-//         cin >> userChoice;
-
-//         if (userChoice == 1) {
-//             displayCatalog(catalog);
-//         } else if (userChoice == 2) {
-//             manageCatalog(catalog);
-//         } else if (userChoice == 3) {
-//             cout << "Terima kasih, sampai jumpa!" << endl;
-//             break;
-//         } else {
-//             cout << "Pilihan tidak valid, coba lagi." << endl;
-//         }
-//     }
-
-//     return 0;
-// }
 #pragma endregion
 
 #pragma region Informasi Pemesanan & Booking (Mahfud & Diandra)
@@ -511,7 +485,7 @@ void booking(int hargaCetakan)
 
     vector<string> keranjangBarang;
     vector<int> hargaBarang;
-    int indexItem = NULL;
+    int indexItem = None;
 
     // // Input nama file
     // cout << "Masukkan nama file yang ingin dicetak: ";
