@@ -915,36 +915,10 @@ void konfirmasiPesanan()
 #pragma endregion
 
 #pragma region Informasi Pelanggan (Rian)
-
-// void inputDataAwal(vector<Akun> &dataPelanggan, int &idPelanggan)
-// {
-//     int jumlah;
-//     cout << "Masukkan jumlah data pelanggan awal: ";
-//     cin >> jumlah;
-//     cin.ignore(); // Mengabaikan newline setelah input jumlah
-
-//     for (int i = 0; i < jumlah; ++i)
-//     {
-//         Akun akunBarun;
-//         cout << "\nData pelanggan ke-" << (i + 1) << ":" << endl;
-//         cout << "Masukkan Nama: ";
-//         getline(cin, pelangganBaru.nama);
-//         cout << "Masukkan Nomor Telepon: ";
-//         getline(cin, pelangganBaru.nomorTelepon);
-//         cout << "Masukkan Username: ";
-//         getline(cin, pelangganBaru.username);
-//         cout << "Masukkan Password: ";
-//         getline(cin, pelangganBaru.password);
-
-//         dataPelanggan.push_back(pelangganBaru);
-//         idPelanggan++;
-//     }
-// }
-
 void tampilkanMenu()
 {
     cout << "\n=== Menu Utama ===" << endl;
-    cout << "1. Tambah Data Pelanggan" << endl;
+    cout << "1. Tambah Akun Admin" << endl;
     cout << "2. Hapus Data Pelanggan" << endl;
     cout << "3. Keluar" << endl;
     cout << "Pilih opsi: ";
@@ -1014,36 +988,6 @@ void lihatSemuaAkunPengguna(const vector<Akun> &dataPelanggan)
              << ", Password: " << pelanggan.password << endl;
     }
 }
-
-// int main() {
-//     vector<Akun> dataPelanggan;
-//     int idPelanggan = 1;
-//     int pilihan;
-
-//     inputDataAwal(dataPelanggan, idPelanggan);
-
-//     do {
-//         lihatSemuaAkunPelanggan(dataPelanggan);
-//         tampilkanMenu();
-//         cin >> pilihan;
-
-//         switch (pilihan) {
-//             case 1:
-//                 tambahAkunAdmin(dataPelanggan, idPelanggan);
-//                 break;
-//             case 2:
-//                 hapusAkun(dataPelanggan);
-//                 break;
-//             case 3:
-//                 cout << "Keluar dari program. Terima kasih!" << endl;
-//                 break;
-//             default:
-//                 cout << "Pilihan tidak valid. Coba lagi." << endl;
-//         }
-//     } while (pilihan != 3);
-
-//     return 0;
-// }
 #pragma endregion
 
 #pragma region Laporan Keuangan dan Konfirmasi Pemesanan (Dendy)
